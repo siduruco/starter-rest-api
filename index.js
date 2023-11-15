@@ -18,6 +18,7 @@ const serviceAccountAuth = new JWT({
 const doc = new GoogleSpreadsheet(process.env.GOOGLE_SPREAD_SHEET_ID, serviceAccountAuth);
 
 app.use(express.json());
+
 app.use(express.urlencoded({ extended: true }));
 
 // #############################################################################
