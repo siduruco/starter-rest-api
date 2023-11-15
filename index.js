@@ -73,7 +73,7 @@ app.get("/:col/page/:offset", async (req, res) => {
   const sheet = doc.sheetsByTitle[col];
   const page = [];
   for (let i = 0; i < 100; i++) {
-    if (i % 5 === 0) page.push(i);
+    if (i % 4 === 0) page.push(i);
   }
   const rows = await sheet.getRows({ limit: 5, offset: page[offset] }); // can pass in { limit, offset }
   const column = rows[0]?._worksheet?._headerValues;
