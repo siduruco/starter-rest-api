@@ -1,6 +1,23 @@
+require("fix-esm").register();
 const express = require("express");
 const app = express();
-const db = require("@cyclic.sh/dynamodb");
+
+const { GoogleSpreadsheet } = require("google-spreadsheet");
+const { JWT } = require("google-auth-library");
+
+// Initialize auth - see https://theoephraim.github.io/node-google-spreadsheet/#/guides/authentication
+const serviceAccountAuth = new JWT({
+  email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
+  key: process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, "\n"),
+  scopes: ["https://www.googleapis.com/auth/spreadsheets"],
+});
+
+const doc = new GoogleSpreadsheet(process.env.GOOGLE_SPREAD_SHEET_ID, serviceAccountAuth);
+
+(async () => {
+  await doc.loadInfo(); // loads document properties and worksheets
+  console.log(doc.title);
+})();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -16,48 +33,35 @@ const options = {
   maxAge: "1m",
   redirect: false,
 };
-app.use(express.static("public", options));
+// app.use(express.static("public", options));
 // #############################################################################
 
 // Create or Update an item
-app.post("/data/:col/:key", async (req, res) => {
+app.post("/:factory/:col/:key", async (req, res) => {
   console.log(req.body);
-
   const col = req.params.col;
   const key = req.params.key;
-  console.log(`from collection: ${col} delete key: ${key} with params ${JSON.stringify(req.params)}`);
-  const item = await db.collection(col).set(key, req.body);
-  console.log(JSON.stringify(item, null, 2));
-  res.json(item).end();
+  res.json(req.body).end();
 });
 
 // Delete an item
-app.delete("/data/:col/:key", async (req, res) => {
+app.delete("/:factory/:col/:key", async (req, res) => {
   const col = req.params.col;
   const key = req.params.key;
-  console.log(`from collection: ${col} delete key: ${key} with params ${JSON.stringify(req.params)}`);
-  const item = await db.collection(col).delete(key);
-  console.log(JSON.stringify(item, null, 2));
-  res.json(item).end();
+  res.json(req.params).end();
 });
 
 // Get a single item
-app.get("/data/:col/:key", async (req, res) => {
+app.get("/:factory/:col/:key", async (req, res) => {
   const col = req.params.col;
   const key = req.params.key;
-  console.log(`from collection: ${col} get key: ${key} with params ${JSON.stringify(req.params)}`);
-  const item = await db.collection(col).get(key);
-  console.log(JSON.stringify(item, null, 2));
-  res.json(item).end();
+  res.json(req.params).end();
 });
 
 // Get a full listing
-app.get("/data/:col", async (req, res) => {
+app.get("/:factory/:col", async (req, res) => {
   const col = req.params.col;
-  console.log(`list collection: ${col} with params: ${JSON.stringify(req.params)}`);
-  const items = await db.collection(col).list();
-  console.log(JSON.stringify(items, null, 2));
-  res.json(items).end();
+  res.json(req.params).end();
 });
 
 // Catch all handler for all other request.
