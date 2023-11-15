@@ -1,4 +1,5 @@
 require("fix-esm").register();
+
 const express = require("express");
 const app = express();
 
@@ -9,15 +10,10 @@ const { JWT } = require("google-auth-library");
 const serviceAccountAuth = new JWT({
   email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
   key: process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, "\n"),
-  scopes: ["https://www.googleapis.com/auth/spreadsheets"],
+  scopes: ["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive.file"],
 });
 
 const doc = new GoogleSpreadsheet(process.env.GOOGLE_SPREAD_SHEET_ID, serviceAccountAuth);
-
-(async () => {
-  await doc.loadInfo(); // loads document properties and worksheets
-  console.log(doc.title);
-})();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -25,6 +21,7 @@ app.use(express.urlencoded({ extended: true }));
 // #############################################################################
 // This configures static hosting for files in /public that have the extensions
 // listed in the array.
+
 const options = {
   dotfiles: "ignore",
   etag: false,
@@ -33,11 +30,12 @@ const options = {
   maxAge: "1m",
   redirect: false,
 };
+
 // app.use(express.static("public", options));
 // #############################################################################
 
 // Create or Update an item
-app.post("/:factory/:col/:key", async (req, res) => {
+app.post("/:col/:key", async (req, res) => {
   console.log(req.body);
   const col = req.params.col;
   const key = req.params.key;
@@ -45,23 +43,45 @@ app.post("/:factory/:col/:key", async (req, res) => {
 });
 
 // Delete an item
-app.delete("/:factory/:col/:key", async (req, res) => {
+app.delete("/:col/:key", async (req, res) => {
   const col = req.params.col;
   const key = req.params.key;
   res.json(req.params).end();
 });
 
 // Get a single item
-app.get("/:factory/:col/:key", async (req, res) => {
+app.get("/:col/:key", async (req, res) => {
   const col = req.params.col;
   const key = req.params.key;
-  res.json(req.params).end();
+  await doc.loadInfo();
+  const sheet = await doc.addSheet({ headerValues: [`=QUERY(${col},"SELECT * WHERE A = ${key}",1)`] });
+  const rows = await sheet.getRows();
+  const column = rows[0]?._worksheet?._headerValues;
+  const row = [];
+  rows.forEach((element) => {
+    row.push(element?._rawData);
+  });
+  await sheet.delete();
+  res.json({ column, row }).end();
 });
 
 // Get a full listing
-app.get("/:factory/:col", async (req, res) => {
+app.get("/:col/page/:offset", async (req, res) => {
   const col = req.params.col;
-  res.json(req.params).end();
+  const offset = parseFloat(req.params.offset) - 1;
+  await doc.loadInfo();
+  const sheet = doc.sheetsByTitle[col];
+  const page = [];
+  for (let i = 0; i < 100; i++) {
+    if (i % 5 === 0) page.push(i);
+  }
+  const rows = await sheet.getRows({ limit: 5, offset: page[offset] }); // can pass in { limit, offset }
+  const column = rows[0]?._worksheet?._headerValues;
+  const row = [];
+  rows.forEach((element) => {
+    row.push(element?._rawData);
+  });
+  res.json({ column, row }).end();
 });
 
 // Catch all handler for all other request.
