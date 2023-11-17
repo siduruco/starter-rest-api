@@ -33,7 +33,7 @@
     <link rel="stylesheet" href="css/core.css" />
   </head>
   <body>
-    <header>
+    <header class="">
       <!-- Navbar -->
       <nav class="navbar navbar-expand-lg navbar-light bg-white">
         <div class="container-fluid">
@@ -70,53 +70,41 @@
 
       <!-- Jumbotron -->
       <div class="p-5 text-center bg-light">
-        <h1 class="mb-3">
-          <img src="https://mdbcdn.b-cdn.net/img/logo/mdb-transaprent-noshadows.webp" height="50" alt="MDB Logo" loading="lazy" />
-        </h1>
-        <h4 class="mb-3">Subheading</h4>
-        <a class="btn btn-primary" href="" role="button">Call to action</a>
+        <p class="h3">
+          Header
+        </p>
       </div>
       <!-- Jumbotron -->
     </header>
-    <main class="py-5 container">
+    <main class="py-5">
       {{{body}}}
     </main>
-    <!-- Footer -->
-    <footer class="bg-primary text-center text-white fixed-bottom">
-      <!-- Grid container -->
-      <div class="container p-4 pb-0">
-        <!-- Section: Social media -->
-        <section class="mb-4">
-          <!-- Facebook -->
-          <a class="btn btn-outline-light btn-floating m-1" href="#!" role="button"><i class="fab fa-facebook-f"></i></a>
+    <footer>
+      <div class="d-flex flex-column flex-md-row text-center text-md-start justify-content-between py-4 px-4 px-xl-5 bg-primary">
+        <!-- Copyright -->
+        <div class="text-white mb-3 mb-md-0">
+          Copyright © 2020. All rights reserved.
+        </div>
+        <!-- Copyright -->
 
-          <!-- Twitter -->
-          <a class="btn btn-outline-light btn-floating m-1" href="#!" role="button"><i class="fab fa-twitter"></i></a>
-
-          <!-- Google -->
-          <a class="btn btn-outline-light btn-floating m-1" href="#!" role="button"><i class="fab fa-google"></i></a>
-
-          <!-- Instagram -->
-          <a class="btn btn-outline-light btn-floating m-1" href="#!" role="button"><i class="fab fa-instagram"></i></a>
-
-          <!-- Linkedin -->
-          <a class="btn btn-outline-light btn-floating m-1" href="#!" role="button"><i class="fab fa-linkedin-in"></i></a>
-
-          <!-- Github -->
-          <a class="btn btn-outline-light btn-floating m-1" href="#!" role="button"><i class="fab fa-github"></i></a>
-        </section>
-        <!-- Section: Social media -->
+        <!-- Right -->
+        <div>
+          <a href="#!" class="text-white me-4">
+            <i class="fab fa-facebook-f"></i>
+          </a>
+          <a href="#!" class="text-white me-4">
+            <i class="fab fa-twitter"></i>
+          </a>
+          <a href="#!" class="text-white me-4">
+            <i class="fab fa-google"></i>
+          </a>
+          <a href="#!" class="text-white">
+            <i class="fab fa-linkedin-in"></i>
+          </a>
+        </div>
+        <!-- Right -->
       </div>
-      <!-- Grid container -->
-
-      <!-- Copyright -->
-      <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.2);">
-        © 2020 Copyright:
-        <a class="text-white" href="https://mdbootstrap.com/">MDBootstrap.com</a>
-      </div>
-      <!-- Copyright -->
     </footer>
-    <!-- Footer -->
   </body>
   <script src="js/core.js" type="text/javascript"></script>
   <script src="js/module.js" type="text/javascript"></script>
