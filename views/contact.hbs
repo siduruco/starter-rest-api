@@ -1,0 +1,65 @@
+<div class="card container">
+  <div class="card-header">
+    <a class="btn btn-primary" href="/contact/add">Add</a>
+  </div>
+  <div class="card-body">
+    <table class="table table-hover table-sm">
+      <thead>
+        <tr>
+          {{#each column}}
+            <th scope="col" style="text-transform:capitalize;" class="fw-bold h5">
+              {{this}}
+            </th>
+          {{/each}}
+        </tr>
+      </thead>
+      <tbody>
+        {{#each row}}
+          <tr>
+            {{#each data}}
+              {{#if (ifStatus this)}}
+                <th style="text-transform:capitalize;">
+                  {{this}}
+                </th>
+              {{/if}}
+            {{/each}}
+            <th>
+              <div class="form-check form-switch">
+                {{#if (isTrue status)}}
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    role="switch"
+                    id="switchStatus{{id}}"
+                    checked
+                    onchange="location.href = `${location.pathname}?edit={{id}}`"
+                    onclick="this.setAttribute('disabled', 'disabled')"
+                  />
+                {{else}}
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    role="switch"
+                    id="switchStatus{{id}}"
+                    onchange="location.href = `${location.pathname}?edit={{id}}`"
+                    onclick="this.setAttribute('disabled', 'disabled')"
+                  />
+                {{/if}}
+              </div>
+            </th>
+          </tr>
+        {{/each}}
+      </tbody>
+    </table>
+    <script src="../../js/contact.js" type="module"></script>
+  </div>
+  <div class="card-footer d-flex justify-content-end">
+    <nav aria-label="Page navigation example">
+      <ul class="pagination">
+        <li class="page-item"><a class="page-link" href="/contact/page/{{prev}}">Previous</a></li>
+        <li class="page-item"><a class="page-link" href="#">{{page}}</a></li>
+        <li class="page-item"><a class="page-link" href="/contact/page/{{next}}">Next</a></li>
+      </ul>
+    </nav>
+  </div>
+</div>

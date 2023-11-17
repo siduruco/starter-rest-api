@@ -14,8 +14,7 @@ const col = "contact";
 router.post("/:key", async (req, res) => {
   console.log(req.body);
   const key = req.params.key;
-  await doc.loadInfo();
-  res.json(req.body).end();
+  res.redirect("/contact/page/0");
 });
 
 // Delete an item
@@ -24,39 +23,44 @@ router.delete("/:key", async (req, res) => {
   res.json(req.params).end();
 });
 
-// Get a single item
-router.get("/:key", async (req, res) => {
-  const key = req.params.key;
-  await doc.loadInfo();
-  const sheet = await doc.addSheet({ headerValues: [`=QUERY(${col},"SELECT * WHERE A = ${key}",1)`] });
-  const rows = await sheet.getRows();
-  const column = rows[0]?._worksheet?._headerValues;
-  const row = [];
-  rows.forEach((element, index) => {
-    row.push(element?._rawData);
-  });
-  await sheet.delete();
-  res.json({ column, row }).end();
+router.get("/", async (req, res) => {
+  res.redirect("/contact/page/0");
 });
 
-// Get a full listing
+router.get("/add", async (req, res) => {
+  res.render("contact_add", {});
+});
+
 router.get("/page/:offset", async (req, res) => {
-  const offset = parseFloat(req.params.offset) - 1;
+  const edit = parseFloat(req.query?.edit);
+  const offset = parseFloat(req.params.offset);
   await doc.loadInfo();
   const sheet = doc.sheetsByTitle[col];
+  const detail = isNaN(edit) ? null : await updateStatus(sheet, edit);
   const page = [];
-  for (let i = 0; i < 100; i++) {
-    if (i % 4 === 0) page.push(i);
+  for (let i = 0; i < 1000; i++) {
+    if (i % 5 === 0) page.push(i);
   }
   const rows = await sheet.getRows({ limit: 5, offset: page[offset] }); // can pass in { limit, offset }
   const column = rows[0]?._worksheet?._headerValues;
   const row = [];
-  rows.forEach((element, index) => {
-    console.log(index + 1 + page[offset]);
-    console.log(element?._rawData);
-    row.push(element?._rawData);
+  rows.forEach((element) => {
+    row.push({ id: element?._rowNumber, data: element?._rawData, status: element?._rawData.at(-1) });
   });
-  res.json({ column, row }).end();
+  if (detail === true) return res.redirect("/contact/page/" + parseFloat(req.params.offset));
+  res.render("contact", { column, row, detail, next: offset + 1, prev: offset === 0 ? 0 : offset - 1, page: offset });
 });
+
+async function updateStatus(sheet, offset) {
+  await sheet.loadCells("A:D"); // loads range of cells into local cache - DOES NOT RETURN THE CELLS
+  const status = sheet.getCellByA1(`D${offset}`);
+  if (status.value === "TRUE") {
+    status.value = "FALSE";
+  } else {
+    status.value = "TRUE";
+  }
+  await sheet.saveUpdatedCells(); // save all updates in one call
+  return true;
+}
 
 module.exports = router;

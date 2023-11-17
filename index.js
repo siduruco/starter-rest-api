@@ -4,11 +4,29 @@ const express = require("express");
 
 const app = express();
 
+const hbs = require("hbs");
+
 const path = require("path");
 
 app.set("view engine", "hbs");
 
 app.set("views", path.join(__dirname, "views"));
+
+// Register a custom helper function
+hbs.registerHelper("isTrue", function (value) {
+  switch (value) {
+    case "TRUE":
+      return true;
+    case "FALSE":
+      return false;
+    default:
+      return "";
+  }
+});
+
+hbs.registerHelper("ifStatus", function (value) {
+  if (value !== "TRUE" && value !== "FALSE") return value;
+});
 
 app.use(express.json());
 
