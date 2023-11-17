@@ -1,24 +1,31 @@
 const express = require("express");
 const router = express.Router();
+const { GoogleSpreadsheet } = require("google-spreadsheet");
+const { JWT } = require("google-auth-library");
+const serviceAccountAuth = new JWT({
+  email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
+  key: process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, "\n"),
+  scopes: ["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive.file"],
+});
+const doc = new GoogleSpreadsheet(process.env.GOOGLE_SPREAD_SHEET_ID, serviceAccountAuth);
+const col = "contact";
 
 // Create or Update an item
-app.post("/:col/:key", async (req, res) => {
+router.post("/:key", async (req, res) => {
   console.log(req.body);
-  const col = req.params.col;
   const key = req.params.key;
+  await doc.loadInfo();
   res.json(req.body).end();
 });
 
 // Delete an item
-app.delete("/:col/:key", async (req, res) => {
-  const col = req.params.col;
+router.delete("/:key", async (req, res) => {
   const key = req.params.key;
   res.json(req.params).end();
 });
 
 // Get a single item
-app.get("/:col/:key", async (req, res) => {
-  const col = req.params.col;
+router.get("/:key", async (req, res) => {
   const key = req.params.key;
   await doc.loadInfo();
   const sheet = await doc.addSheet({ headerValues: [`=QUERY(${col},"SELECT * WHERE A = ${key}",1)`] });
@@ -33,8 +40,7 @@ app.get("/:col/:key", async (req, res) => {
 });
 
 // Get a full listing
-app.get("/:col/page/:offset", async (req, res) => {
-  const col = req.params.col;
+router.get("/page/:offset", async (req, res) => {
   const offset = parseFloat(req.params.offset) - 1;
   await doc.loadInfo();
   const sheet = doc.sheetsByTitle[col];
@@ -52,3 +58,5 @@ app.get("/:col/page/:offset", async (req, res) => {
   });
   res.json({ column, row }).end();
 });
+
+module.exports = router;
