@@ -10,25 +10,42 @@ const serviceAccountAuth = new JWT({
 const doc = new GoogleSpreadsheet(process.env.GOOGLE_SPREAD_SHEET_ID, serviceAccountAuth);
 const col = "contact";
 
+let statusPost = null;
 // Create or Update an item
-router.post("/:key", async (req, res) => {
-  console.log(req.body);
-  const key = req.params.key;
-  res.redirect("/contact/page/0");
+router.post("/add", async (req, res) => {
+  try {
+    req.body["status"] = "FALSE";
+    statusPost = true;
+    await doc.loadInfo();
+    const sheet = doc.sheetsByTitle[col];
+    const add = await sheet.addRow(req.body);
+    res.redirect("/contact/add");
+  } catch (error) {
+    statusPost = false;
+    res.redirect("/contact/add");
+  }
 });
 
-// Delete an item
-router.delete("/:key", async (req, res) => {
-  const key = req.params.key;
-  res.json(req.params).end();
+router.get("/add", async (req, res) => {
+  const status = req.query?.status;
+  const object = {};
+  switch (statusPost) {
+    case true:
+      object["success"] = { title: "Success!", text: "Data saved successfully!" };
+      break;
+    case false:
+      object["danger"] = { title: "Failed!", text: "Failed to save data. Please try again." };
+      break;
+
+    default:
+      break;
+  }
+  statusPost = null;
+  res.render("contact_add", object);
 });
 
 router.get("/", async (req, res) => {
   res.redirect("/contact/page/0");
-});
-
-router.get("/add", async (req, res) => {
-  res.render("contact_add", {});
 });
 
 router.get("/page/:offset", async (req, res) => {
@@ -38,7 +55,7 @@ router.get("/page/:offset", async (req, res) => {
   const sheet = doc.sheetsByTitle[col];
   const detail = isNaN(edit) ? null : await updateStatus(sheet, edit);
   const page = [];
-  for (let i = 0; i < 1000; i++) {
+  for (let i = 0; i < 100; i++) {
     if (i % 5 === 0) page.push(i);
   }
   const rows = await sheet.getRows({ limit: 5, offset: page[offset] }); // can pass in { limit, offset }

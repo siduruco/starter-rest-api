@@ -93,6 +93,26 @@
         <!-- Right -->
       </div>
     </footer>
+    <!-- Modal -->
+    <div
+      class="modal fade"
+      id="alertModal"
+      data-mdb-backdrop="static"
+      data-mdb-keyboard="false"
+      tabindex="-1"
+      aria-labelledby="alertModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-fullscreen">
+        <div class="modal-content bg-transparent">
+          <div class="modal-body d-flex justify-content-center align-items-center">
+            <i class="fa-duotone fa-spinner-third fa-spin text-light h3"></i>
+          </div>
+        </div>
+      </div>
+    </div>
   </body>
-
+  <script defer>
+    function modal(){ new mdb.Modal(document.getElementById('alertModal')).show(); }
+  </script>
 </html>

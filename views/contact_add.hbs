@@ -1,21 +1,35 @@
 <div class="card container">
   <div class="card-body">
-    <form action="/contact/add" method="post" enctype="application/x-www-form-urlencoded">
+    {{#if success}}
+      <div class="alert alert-dismissible fade show" role="alert" data-mdb-color="success" data-mdb-delay="3000" data-mdb-autohide="true">
+        <strong>{{success.title}}!</strong>
+        {{success.text}}
+        <button type="button" class="btn-close" data-mdb-dismiss="alert" aria-label="Close"></button>
+      </div>
+    {{/if}}
+    {{#if danger}}
+      <div class="alert alert-dismissible fade show" role="alert" data-mdb-color="danger" data-mdb-delay="3000" data-mdb-autohide="true">
+        <strong>{{danger.title}}!</strong>
+        {{danger.text}}
+        <button type="button" class="btn-close" data-mdb-dismiss="alert" aria-label="Close"></button>
+      </div>
+    {{/if}}
+    <form action="/contact/add" method="post" enctype="application/x-www-form-urlencoded" id="form-contact-add" onsubmit="modal()">
       <!-- Name input -->
       <div class="form-outline mb-4">
-        <input type="text" id="firstNameInput" class="form-control" />
+        <input type="text" id="firstNameInput" class="form-control" name="first" required maxlength="24" minlength="3" />
         <label class="form-label" for="firstNameInput">First Name</label>
       </div>
 
       <!-- Email input -->
       <div class="form-outline mb-4">
-        <input type="text" id="lastNameInput" class="form-control" />
+        <input type="text" id="lastNameInput" class="form-control" name="last" required maxlength="24" minlength="3" />
         <label class="form-label" for="lastNameInput">Last Name</label>
       </div>
 
       <!-- Message input -->
       <div class="form-outline mb-4">
-        <input type="number" class="form-control" id="phone" />
+        <input type="number" class="form-control" id="phone" name="phone" required maxlength="24" minlength="3" />
         <label class="form-label" for="phone">Phone</label>
       </div>
 
