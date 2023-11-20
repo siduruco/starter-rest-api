@@ -49,34 +49,45 @@ router.get("/", async (req, res) => {
 });
 
 router.get("/page/:offset", async (req, res) => {
-  const edit = parseFloat(req.query?.edit);
   const offset = parseFloat(req.params.offset);
   await doc.loadInfo();
   const sheet = doc.sheetsByTitle[col];
-  const detail = isNaN(edit) ? null : await updateStatus(sheet, edit);
+  const del = isNaN(parseFloat(req.query?.del)) ? null : await deleteContact(sheet, parseFloat(req.query?.del));
+  const detail = isNaN(parseFloat(req.query?.edit)) ? null : await updateStatus(sheet, parseFloat(req.query?.edit));
   const page = [];
   for (let i = 0; i < 100; i++) {
-    if (i % 5 === 0) page.push(i);
+    if (i % 10 === 0) page.push(i);
   }
-  const rows = await sheet.getRows({ limit: 5, offset: page[offset] }); // can pass in { limit, offset }
+  const rows = await sheet.getRows({ limit: 10, offset: page[offset] });
   const column = rows[0]?._worksheet?._headerValues;
   const row = [];
   rows.forEach((element) => {
-    row.push({ id: element?._rowNumber, data: element?._rawData, status: element?._rawData.at(-1) });
+    row.push({ id: element?._rowNumber, data: element?._rawData, status: element?._rawData.at(-1), offset });
   });
   if (detail === true) return res.redirect("/contact/page/" + parseFloat(req.params.offset));
-  res.render("contact", { column, row, detail, next: offset + 1, prev: offset === 0 ? 0 : offset - 1, page: offset });
+  if (del === true) return res.redirect("/contact/page/" + parseFloat(req.params.offset));
+  res.render("contact", { column, row, detail, next: offset + 1, prev: offset === 0 ? 0 : offset - 1, page: offset + 1 });
 });
 
+async function deleteContact(sheet, offset) {
+  try {
+    const rows = await sheet.getRows({ limit: 1, offset: offset - 2 });
+    await rows[0].delete();
+    return true;
+  } catch (error) {
+    return null;
+  }
+}
+
 async function updateStatus(sheet, offset) {
-  await sheet.loadCells("A:D"); // loads range of cells into local cache - DOES NOT RETURN THE CELLS
+  await sheet.loadCells("A:D");
   const status = sheet.getCellByA1(`D${offset}`);
   if (status.value === "TRUE") {
     status.value = "FALSE";
   } else {
     status.value = "TRUE";
   }
-  await sheet.saveUpdatedCells(); // save all updates in one call
+  await sheet.saveUpdatedCells();
   return true;
 }
 

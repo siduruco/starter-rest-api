@@ -24,9 +24,9 @@
                   </th>
                 {{/if}}
               {{/each}}
-              <th>
+              <th class="d-flex justify-content-start align-items-center">
                 <!-- Button trigger modal -->
-                <div class="form-check form-switch">
+                <div class="form-check form-switch me-4">
                   {{#if (isTrue status)}}
                     <input
                       class="form-check-input"
@@ -49,6 +49,30 @@
                       data-mdb-target="#alertModal"
                     />
                   {{/if}}
+                </div>
+                <div>
+                  {{#if (isTrue status)}}
+                    <button
+                      type="submit"
+                      class="btn-close"
+                      aria-label="Close"
+                      id="deleteStatus{{id}}"
+                      data-mdb-toggle="modal"
+                      data-mdb-target="#alertModal"
+                      onclick="location.href = `${location.pathname}?del={{id}}`"
+                    ></button>
+                  {{else}}
+                    <button
+                      type="submit"
+                      class="btn-close" 
+                      aria-label="Close"
+                      id="deleteStatus{{id}}"
+                      data-mdb-toggle="modal"
+                      data-mdb-target="#alertModal"
+                      onclick="location.href = `${location.pathname}?del={{id}}`"
+                    ></button>
+                  {{/if}}
+
                 </div>
               </th>
             </tr>

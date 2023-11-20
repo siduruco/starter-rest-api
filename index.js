@@ -28,6 +28,10 @@ hbs.registerHelper("ifStatus", function (value) {
   if (value !== "TRUE" && value !== "FALSE") return value;
 });
 
+hbs.registerHelper("plus", function (value) {
+  return parseFloat(value) + 1;
+});
+
 app.use(express.json());
 
 app.use(express.urlencoded({ extended: true }));

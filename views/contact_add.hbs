@@ -14,7 +14,7 @@
         <button type="button" class="btn-close" data-mdb-dismiss="alert" aria-label="Close"></button>
       </div>
     {{/if}}
-    <form action="/contact/add" method="post" enctype="application/x-www-form-urlencoded" id="form-contact-add" onsubmit="modal()">
+    <form enctype="application/x-www-form-urlencoded" id="form-contact-add" method="post" action="/contact/add">
       <!-- Name input -->
       <div class="form-outline mb-4">
         <input type="text" id="firstNameInput" class="form-control" name="first" required maxlength="24" minlength="3" />
@@ -38,3 +38,4 @@
     </form>
   </div>
 </div>
+<script src="../../js/contact.min.js" defer></script>
